@@ -752,7 +752,7 @@ if __name__ == '__main__':
     floorplans_path = os.listdir(input_dir)
 
     test_number = 0
-    start_time = time.clock()
+    start_time = time.perf_counter()
     temp_time = start_time
 
     for floorplan_path in floorplans_path:
@@ -775,11 +775,11 @@ if __name__ == '__main__':
         output = Image.fromarray(np.uint8(output_map))
         output.save(f'{output_dir}/{floorplan_path}')            
 
-        end_time = time.clock()
+        end_time = time.perf_counter()
         print(f'{floorplan_path}: {(end_time-temp_time):.2f}s')
         temp_time = end_time
 
-    end_time = time.clock()
+    end_time = time.perf_counter()
     cost_time = end_time-start_time
     print(f'Total test time: {cost_time:.2f}s')
     print(f'Total test number: {test_number}')

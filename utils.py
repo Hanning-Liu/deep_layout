@@ -1,3 +1,13 @@
+import torch as t
+
+def get_device():
+    if t.cuda.is_available():
+        return t.device('cuda')
+    elif hasattr(t.backends, 'mps') and t.backends.mps.is_available():
+        return t.device('mps')
+    else:
+        return t.device('cpu')
+
 room_label = [(0,'LivingRoom'),
             (1,'MasterRoom'),
             (2,'Kitchen'),

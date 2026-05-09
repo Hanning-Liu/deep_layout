@@ -16,6 +16,7 @@ import os
 opt =  WallConfig()
 log = utils.log
 data_size = 256
+device = utils.get_device()
     
 def train(**kwargs):
     name = time.strftime('wall_train_%Y%m%d_%H%M%S')
@@ -57,8 +58,8 @@ def train(**kwargs):
             model.load_model(opt.load_model_path)
         if opt.load_connect_path:
             connect.load_model(opt.load_connect_path)
-    model.cuda()
-    connect.cuda()
+    model.to(device)
+    connect.to(device)
 
     # step2: data
     log(log_file, 'Building dataset...')
@@ -91,7 +92,7 @@ def train(**kwargs):
     # criterion = t.nn.CrossEntropyLoss()    
     weight = t.ones(3)
     weight[0] = 1.25
-    weight = weight.cuda()
+    weight = weight.to(device)
     criterion = t.nn.CrossEntropyLoss(weight=weight)
     loss_meter = meter.AverageValueMeter()  
       
@@ -115,8 +116,8 @@ def train(**kwargs):
         log(log_file, f'Training epoch: {current_epoch}')
 
         for i, (input, target) in tqdm(enumerate(train_dataloader)):
-            input = input.cuda()
-            target = target.cuda()
+            input = input.to(device)
+            target = target.to(device)
             optimizer.zero_grad()
             score_model = model(input)
             score_connect = connect(score_model)
@@ -175,7 +176,7 @@ def val(model, connect, dataloader, file):
     for _, (input, target) in enumerate(dataloader):
         batch_size = input.shape[0]
         with t.no_grad():
-            input = input.cuda()
+            input = input.to(device)
             score_model = model(input)
             score_connect = connect(score_model)
                   
