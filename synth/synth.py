@@ -9,6 +9,8 @@ import utils
 import time
 import os
 
+device = utils.get_device()
+
 mask_size = 9
 data_size = 256
 sample_density = 8
@@ -39,8 +41,8 @@ class Synth():
         model.load_model(model_path, from_multi_GPU)
         connect.load_model(connect_path, from_multi_GPU)            
 
-        model.cuda()
-        connect.cuda()
+        model.to(device)
+        connect.to(device)
         model.eval()
         connect.eval()   
         return model, connect    
@@ -140,7 +142,7 @@ class Synth():
     def add_living(self):
         self.composite = self.floorplan.get_composite_living(num_extra_channels=0)
         with t.no_grad():
-            input = self.composite.unsqueeze(0).cuda()
+            input = self.composite.unsqueeze(0).to(device)
             score_model = self.living_model(input)
             score_connect = self.living_connect(score_model)
             output = score_connect.cpu().numpy().astype(int)
@@ -153,9 +155,9 @@ class Synth():
     def should_continue(self):
         self.composite = self.floorplan.get_composite_continue(num_extra_channels=0)
         with t.no_grad():
-            input = self.composite.unsqueeze(0).cuda()
+            input = self.composite.unsqueeze(0).to(device)
             score_model = self.continue_model(input)
-            existing = self.floorplan.existing_category.unsqueeze(0).cuda()
+            existing = self.floorplan.existing_category.unsqueeze(0).to(device)
             score_model = t.cat([score_model, existing], 1)
             score_connect = self.continue_connect(score_model)
             output = self.softmax(score_connect).cpu().numpy()
@@ -166,7 +168,7 @@ class Synth():
     def add_room(self):
         self.composite = self.floorplan.get_composite_location(num_extra_channels=0)
         with t.no_grad():
-            input = self.composite.unsqueeze(0).cuda()
+            input = self.composite.unsqueeze(0).to(device)
             score_model = self.location_model(input)
             score_connect = self.location_connect(score_model)
             
@@ -226,7 +228,7 @@ class Synth():
     def add_wall(self):
         self.composite = self.floorplan.get_composite_wall(num_extra_channels=0)
         with t.no_grad():
-            input = self.composite.unsqueeze(0).cuda()
+            input = self.composite.unsqueeze(0).to(device)
             score_model = self.wall_model(input)
             score_connect = self.wall_connect(score_model)
             score_softmax = self.softmax(score_connect)
@@ -261,7 +263,7 @@ if __name__=='__main__':
     name = time.strftime('synth_%Y%m%d_%H%M%S')
     log_file = open(f"{name}.txt", 'w')
     test_number = 0
-    start_time = time.clock()
+    start_time = time.perf_counter()
     temp_time = start_time
  
     for input_path in os.listdir(synth_input_dir):
@@ -281,11 +283,11 @@ if __name__=='__main__':
         synthesizer.add_wall()
         synthesizer.save_synth_result(synth_output_dir, output_path=input_path)
 
-        end_time = time.clock()
+        end_time = time.perf_counter()
         utils.log(log_file, f'{input_path}: {(end_time-temp_time):.2f}s')
         temp_time = end_time
 
-    end_time = time.clock()
+    end_time = time.perf_counter()
     cost_time = end_time-start_time
     utils.log(log_file)
     utils.log(log_file, f'Total test time: {cost_time:.2f}s')

@@ -15,6 +15,7 @@ import os
 
 opt = ContinueConfig()
 log = utils.log
+device = utils.get_device()
     
 def train(**kwargs):
     name = time.strftime('continue_train_%Y%m%d_%H%M%S')
@@ -57,8 +58,8 @@ def train(**kwargs):
             model.load_model(opt.load_model_path)
         if opt.load_connect_path:
             connect.load_model(opt.load_connect_path)
-    model.cuda()
-    connect.cuda()
+    model.to(device)
+    connect.to(device)
 
     # step2: data
     log(log_file, 'Building dataset...')
@@ -110,11 +111,11 @@ def train(**kwargs):
         log(log_file, f'Training epoch: {current_epoch}')
 
         for i, (input, target, existing) in tqdm(enumerate(train_dataloader)):
-            input = input.cuda()
-            target = target.cuda()
+            input = input.to(device)
+            target = target.to(device)
             optimizer.zero_grad()
             score_model = model(input)
-            existing = existing.cuda()
+            existing = existing.to(device)
             score_model = t.cat([score_model, existing], 1)
             score_connect = connect(score_model)
             loss = criterion(score_connect, target)
@@ -166,9 +167,9 @@ def val(model, connect, dataloader, file):
 
     for _, (input, target, existing) in enumerate(dataloader):
         with t.no_grad():
-            input = input.cuda()
+            input = input.to(device)
             score_model = model(input)
-            existing = existing.cuda()
+            existing = existing.to(device)
             score_model = t.cat([score_model, existing], 1)
             score_connect = connect(score_model)
                 
