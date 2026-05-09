@@ -1,0 +1,6 @@
+[submodule "third_party/RPLAN-Toolbox"]
+	path = third_party/RPLAN-Toolbox
+	url = https://github.com/zzilch/RPLAN-Toolbox.git
+[submodule "third_party/Graph2plan"]
+	path = third_party/Graph2plan
+	url = https://github.com/HanHan55/Graph2plan.git
