@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+
+# 生成物与大数据（勿提交；需要时用说明文档或脚本路径本地放置）
+pickle/
+synth_output/
+synth_vectorization/
+*.pth
+train/*/checkpoints/
+train/*/log/
+
+# 本地 RPLAN 解压包与导出栅格（体积大）
+RPLAN dataset/
+dataset/train/
+dataset/val/
+dataset/rplan_derived/
+
+# IDE / 系统
+.DS_Store
+.idea/
+.vscode/
+*.swp
