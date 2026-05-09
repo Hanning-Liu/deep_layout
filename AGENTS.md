@@ -26,6 +26,17 @@ pip install torchnet fire tqdm numpy scipy
 
 No `requirements.txt` exists in the repo. Pillow is installed as a torch/torchvision dependency.
 
+### Git submodules (`third_party/`)
+
+Two submodules must be initialized after cloning:
+
+```
+git submodule update --init --recursive
+```
+
+- **RPLAN-Toolbox** (`third_party/RPLAN-Toolbox/`): Toolbox for loading/processing RPLAN dataset. Extra deps: `scikit-image`, `matplotlib`, `shapely`. Optional: MATLAB (for alignment), `faiss` (for clustering).
+- **Graph2plan** (`third_party/Graph2plan/`): Graph-based floorplan generation (SIGGRAPH 2020). Contains Network, Interface (Django web app), and PostProcess modules. Extra deps: `pytorch-ignite`, `django`, `opencv-python`, `pandas`, `shapely`.
+
 ### Key caveats
 
 - **No GPU in Cloud Agent VMs**: All training scripts and `synth/synth.py` call `.cuda()`. For CPU-only development, model instantiation and forward passes work, but actual training/synthesis requires wrapping with device-aware code or a GPU environment.
